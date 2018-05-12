@@ -1,0 +1,39 @@
+{
+  "name": "@floms-inc/response-raider",
+  "version": "0.0.1",
+  "description": "Intercept and modify response bodies and headers for debugging purposes on chrome",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:dev": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/floms/response-raider.git"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Yoel Nunez",
+    "email": "y.nunez@floms.com",
+    "url": "http://www.yoelnunez.com/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/floms/response-raider/issues"
+  },
+  "devDependencies": {
+    "@types/btoa": "^1.2.3",
+    "@types/minimatch": "^3.0.3",
+    "gulp": "^4.0.0",
+    "gulp-copy": "^4.0.1",
+    "typescript": "^3.3.1"
+  },
+  "homepage": "https://github.com/floms/response-raider#readme",
+  "dependencies": {
+    "btoa": "^1.2.1",
+    "chrome-launcher": "^0.11.2",
+    "chrome-remote-interface": "^0.28.0",
+    "minimatch": "^3.0.4"
+  }
+}
