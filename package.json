@@ -33,7 +33,7 @@
   "dependencies": {
     "btoa": "^1.2.1",
     "chrome-launcher": "^0.11.2",
-    "chrome-remote-interface": "^0.28.0",
+    "chrome-remote-interface": "^0.27.2",
     "minimatch": "^3.0.4"
   }
 }
