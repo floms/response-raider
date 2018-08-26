@@ -30,8 +30,14 @@ export const intercept = async (requests: ResponseInterceptorI[]) => {
 
     await Promise.all([Runtime.enable(), Network.enable()]);
 
-    Runtime.consoleAPICalled(({ args, type }: { type: 'log' | 'error' | 'info', args: any }) => {
-        console[type].apply(console, args.map((a: any) => a.value));
+    Runtime.consoleAPICalled(({ args, type }: { type: 'log' | 'error' | 'info' | 'warn', args: any }) => {
+        let logger = console[type];
+
+        if (!logger) {
+            logger = console.log;
+        }
+
+        logger.apply(console, args.map((a: any) => a.value));
     });
 
     await Network.setRequestInterception({
