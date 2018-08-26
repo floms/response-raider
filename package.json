@@ -1,6 +1,6 @@
 {
   "name": "@floms-inc/response-raider",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Intercept and modify response bodies and headers for debugging purposes on chrome",
   "main": "index.js",
   "types": "index.d.ts",
