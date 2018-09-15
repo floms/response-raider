@@ -4,7 +4,7 @@ Are you needing to modify the response to apply test or develop UI code, then Re
 
 ## Usage
 
-```
+```typescript
 import { intercept, ResponseInterceptorI } from '@floms-inc/response-raider';
 
 const interceptors: ResponseInterceptorI[] = [
