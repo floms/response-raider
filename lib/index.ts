@@ -43,22 +43,18 @@ export const intercept = async (requests: ResponseInterceptorI[]) => {
     await Network.setRequestInterception({
         patterns: requests.map(req => ({
             urlPattern: req.uri,
-            interceptionStage: 'HeadersReceived'
+            interceptionStage: 'Request'
         }))
     });
 
     Network.requestIntercepted(async ({ interceptionId, request }: any) => {
-        const response = await Network.getResponseBodyForInterception({
-            interceptionId
-        });
-
         const mockResponse = requests.find(mock => {
             const matcher = new Minimatch(mock.uri);
 
             return matcher.match(request.url);
         });
 
-        if (response.body && mockResponse) {
+        if (mockResponse) {
             console.log(`${request.method} ${request.url}`);
             const mResponse = {
                 headers: mockResponse.headers.map(
@@ -74,8 +70,6 @@ export const intercept = async (requests: ResponseInterceptorI[]) => {
 
             return Network.continueInterceptedRequest({
                 interceptionId,
-                response: response,
-
                 rawResponse: btoa(
                     'HTTP/1.1 200 OK\r\n' +
                     mResponse.headers.join('\r\n') +
@@ -86,8 +80,7 @@ export const intercept = async (requests: ResponseInterceptorI[]) => {
         }
 
         Network.continueInterceptedRequest({
-            interceptionId,
-            response: response
+            interceptionId
         });
     });
 };
