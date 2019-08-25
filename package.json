@@ -1,6 +1,6 @@
 {
   "name": "@floms-inc/response-raider",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Intercept and modify response bodies and headers for debugging purposes on chrome",
   "main": "index.js",
   "types": "index.d.ts",
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/btoa": "^1.2.3",
+    "@types/lodash": "^4.14.137",
     "@types/minimatch": "^3.0.3",
     "gulp": "^4.0.0",
     "gulp-copy": "^4.0.1",
@@ -34,6 +35,8 @@
     "btoa": "^1.2.1",
     "chrome-launcher": "^0.11.2",
     "chrome-remote-interface": "^0.27.2",
+    "http-status-codes": "^1.3.2",
+    "lodash": "^4.17.15",
     "minimatch": "^3.0.4"
   }
 }

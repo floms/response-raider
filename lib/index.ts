@@ -1,18 +1,39 @@
 import { launch } from 'chrome-launcher';
 import { Minimatch } from 'minimatch';
 import btoa from 'btoa';
+import { getStatusText, OK } from 'http-status-codes';
+import * as _ from 'lodash';
 
 const CDP = require('chrome-remote-interface')
 
-export interface ResponseHeaderI {
+const RESPONSE_SEPARATOR = '\r\n';
+
+export interface HeaderI {
     name: string;
     value: any;
 }
 
+export interface RequestI {
+    url: string;
+    method: string;
+    headers: HeaderI[];
+    body?: any;
+}
+
+export interface RequestHandlerI {
+
+}
+
+export interface ResponseI {
+    headers?: HeaderI[];
+    body?: any;
+    status?: number;
+}
+
 export interface ResponseInterceptorI {
     uri: string;
-    headers: ResponseHeaderI[];
-    body: any;
+    response?: ResponseI;
+    handle?: (body: RequestI) => ResponseI
 }
 
 
@@ -48,35 +69,60 @@ export const intercept = async (requests: ResponseInterceptorI[]) => {
     });
 
     Network.requestIntercepted(async ({ interceptionId, request }: any) => {
-        const mockResponse = requests.find(mock => {
+        const handlerMatch = requests.find(mock => {
             const matcher = new Minimatch(mock.uri);
 
             return matcher.match(request.url);
         });
 
-        if (mockResponse) {
-            console.log(`${request.method} ${request.url}`);
-            const mResponse = {
-                headers: mockResponse.headers.map(
-                    response => `${response.name}: ${response.value}`
-                ),
-                body: JSON.stringify(mockResponse.body)
-            };
+        if (handlerMatch) {
+            let response: ResponseI | undefined = handlerMatch.response;
 
-            mResponse.headers.push('Content-Type: application/json; charset=utf-8');
-            mResponse.headers.push('CConnection: closed');
-            mResponse.headers.push(`Date: ${new Date().toUTCString()}`);
-            mResponse.headers.push(`Content-Length: ${mResponse.body.length}`);
+            if (handlerMatch.handle) {
+                response = handlerMatch.handle(((request: any): RequestI => {
+                    const requestObject = {
+                        url: request.url,
+                        method: request.method,
+                        headers: Object.keys(request.headers).map(
+                            name => ({
+                                name,
+                                value: request.headers[name]
+                            })
+                        )
+                    };
 
-            return Network.continueInterceptedRequest({
-                interceptionId,
-                rawResponse: btoa(
-                    'HTTP/1.1 200 OK\r\n' +
-                    mResponse.headers.join('\r\n') +
-                    '\r\n\r\n' +
-                    mResponse.body
-                )
-            });
+                    return requestObject;
+                })(request));
+            }
+
+            if (response) {
+                console.log(`${request.method} ${request.url}`);
+
+                let code = response.status ? response.status : OK;
+
+                const isJSON = typeof response.body === 'object';
+
+                const body = isJSON ? JSON.stringify(response.body) : `${response.body}`;
+
+                const headers = _.map(response.headers, header => `${header.name}: ${header.value}`);
+
+                headers.push(`Content-Length: ${body.length}`);
+
+                if (isJSON) {
+                    headers.push('Content-Type: application/json;');
+                }
+
+                const interceptedRequest = {
+                    interceptionId,
+                    rawResponse: btoa(
+                        `HTTP/1.1 ${code} ${getStatusText(code)}${RESPONSE_SEPARATOR}` +
+                        headers.join(RESPONSE_SEPARATOR) +
+                        `${RESPONSE_SEPARATOR}${RESPONSE_SEPARATOR}${body}`
+                    )
+                };
+
+                return Network.continueInterceptedRequest(interceptedRequest);
+            }
         }
 
         Network.continueInterceptedRequest({
