@@ -52,3 +52,52 @@ intercept(interceptors).then(() => {
 });
 ```
 
+
+## Advanced Usage
+
+In the previous example every time a response mock is updated a browser restart will be required; this could be problematic if you have an application with protected resources that requires login everytime or if the flow you are testing is very complex and involves a lot of steps. To allow more flexibility and ease of use a dynamic response interceptor is available.
+
+`main.ts`
+```typescript
+import { raid, interceptor } from '@floms-inc/response-raider';
+
+interceptor().then(() => {
+  raid('server.js');
+});
+```
+
+`server.ts`
+```typescript
+import { interference } from '@floms-inc/response-raider';
+import { RequestI } from '@floms-inc/response-raider/types';
+
+const requests = [
+    {
+        uri: '**/profile',
+        handle: async (request: RequestI) => {
+            return await {
+                body: {
+                    firstName: 'Yoel',
+                    lastName: 'Nunez',
+                    website: 'http://www.nunez.guru/',
+                }
+            };
+        },
+    },
+    {
+        uri: '**/protected',
+        response: {
+            body: {
+                message: 'user is not allowed'
+            },
+            status: 401
+        }
+    }
+];
+
+interference(requests).then(() => {
+    console.log(`Response interference is active`);
+});
+```
+
+To run this example, simply call `ts-node index.ts`

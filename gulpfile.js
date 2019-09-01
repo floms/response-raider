@@ -6,3 +6,4 @@ gulp.task("copy", async function() {
     .src(["package.json", "README.md"])
     .pipe(copy("./dist/", { prefix: 1 }));
 });
+
