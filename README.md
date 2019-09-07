@@ -2,6 +2,13 @@
 
 Are you needing to modify the response to apply test or develop UI code, then ResponseRaider is your solution. There is no need to create an API server and mock your responses there, just specify the endpoint that needs to be intercepted along with the response and headers and you are all done.
 
+## Installation
+
+```sh
+npm install @floms-inc/response-raider
+```
+
+
 ## Usage
 
 ```typescript
@@ -56,6 +63,19 @@ intercept(interceptors).then(() => {
 ## Advanced Usage
 
 In the previous example every time a response mock is updated a browser restart will be required; this could be problematic if you have an application with protected resources that requires login everytime or if the flow you are testing is very complex and involves a lot of steps. To allow more flexibility and ease of use a dynamic response interceptor is available.
+
+> ***NEW***: with the new `raid` binary executable only the `server.ts` file in the example below is needed. To Run add a script to the `package.json` and to run it is use `npm run launch`
+
+`package.json`
+```json
+{
+  ...
+  "scripts": {
+    "launch": "raid server.ts"
+  }
+  ...
+}
+```
 
 `main.ts`
 ```typescript

@@ -1,6 +1,6 @@
 {
   "name": "@floms-inc/response-raider",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Intercept and modify response bodies and headers for debugging purposes on chrome",
   "main": "index.js",
   "types": "index.d.ts",
@@ -21,6 +21,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/floms/response-raider/issues"
+  },
+  "bin": {
+    "raid": "./bin/raid.js"
   },
   "devDependencies": {
     "@types/btoa": "^1.2.3",
