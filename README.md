@@ -5,14 +5,14 @@ Are you needing to modify the response to apply test or develop UI code, then Re
 ## Installation
 
 ```sh
-npm install @floms-inc/response-raider
+npm install @onefloms/response-raider
 ```
 
 
 ## Usage
 
 ```typescript
-import { intercept, ResponseInterceptorI } from '@floms-inc/response-raider';
+import { intercept, ResponseInterceptorI } from '@onefloms/response-raider';
 
 const interceptors: ResponseInterceptorI[] = [
     // custom status code with request handler
@@ -79,7 +79,7 @@ In the previous example every time a response mock is updated a browser restart 
 
 `main.ts`
 ```typescript
-import { raid, interceptor } from '@floms-inc/response-raider';
+import { raid, interceptor } from '@onefloms/response-raider';
 
 interceptor().then(() => {
   raid('server.js');
@@ -88,8 +88,8 @@ interceptor().then(() => {
 
 `server.ts`
 ```typescript
-import { interference } from '@floms-inc/response-raider';
-import { RequestI } from '@floms-inc/response-raider/types';
+import { interference } from '@onefloms/response-raider';
+import { RequestI } from '@onefloms/response-raider/types';
 
 const requests = [
     {

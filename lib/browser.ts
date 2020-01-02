@@ -10,11 +10,18 @@ import { interceptRequest, handleInterceptedResponse, RaiderConfig } from './uti
 const CDP = require('chrome-remote-interface')
 
 export const intercept = async (requests: ResponseInterceptorI[]) => {
+    const chromeFlags = [
+        '--auto-open-devtools-for-tabs'
+    ];
+
+    const dataPath = RaiderConfig.DataPath;
+
+    if (dataPath) {
+        chromeFlags.push(`--user-data-dir=${dataPath}`);
+    }
+
     const chrome = await launch({
-        chromeFlags: [
-            '--user-data-dir=/tmp/chrome-testing',
-            '--auto-open-devtools-for-tabs'
-        ]
+        chromeFlags
     });
 
     const { Runtime, Network } = await CDP({

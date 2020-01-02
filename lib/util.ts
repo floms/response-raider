@@ -5,13 +5,22 @@ import { AxiosResponse } from 'axios';
 export class RaiderConfig {
     public static NAME = 'x-response-raider';
     private static _log = false;
-
+    private static _dataPath: String;
+    
     static get log() {
         return RaiderConfig._log;
     }
 
     static set log(enable: boolean) {
         RaiderConfig._log = enable;
+    }
+
+    static get DataPath() {
+        return RaiderConfig._dataPath;
+    }
+
+    static set DataPath(path: String) {
+        RaiderConfig._dataPath = path;
     }
 
     static get SERVER() {

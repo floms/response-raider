@@ -1,5 +1,5 @@
 {
-  "name": "@floms-inc/response-raider",
+  "name": "@onefloms/response-raider",
   "version": "0.0.7",
   "description": "Intercept and modify response bodies and headers for debugging purposes on chrome",
   "main": "index.js",
