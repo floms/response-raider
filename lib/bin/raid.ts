@@ -8,7 +8,6 @@ let watchFile: string = '';
 program
     .version('0.1.0')
     .arguments('<file>')
-    .option('-e, --extensions <type>', 'file extensions to watch', (val: string) => val.split(','))
     .action((file: string) => {
         watchFile = file;
     });

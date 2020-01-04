@@ -1,5 +1,5 @@
 import express from 'express';
-import { interceptRequest, RaiderConfig } from './util';
+import { Config, interceptRequest } from './util';
 import { ResponseInterceptorI } from './types';
 const nodemon = require('nodemon');
 
@@ -8,7 +8,7 @@ export const interference = async (requests: ResponseInterceptorI[]) => {
 
     app.use(express.json());
 
-    const serverConfig = RaiderConfig.SERVER;
+    const serverConfig = Config.SERVER;
 
     app.post(serverConfig.path, async (req: any, res: any) => {
         const response = await interceptRequest(requests, req.body);
@@ -16,7 +16,7 @@ export const interference = async (requests: ResponseInterceptorI[]) => {
         if (response) {
             return res.status(response.status || 200).set({
                 ...response.headers,
-                [RaiderConfig.NAME]: true
+                [Config.HEADER]: true
             }).send(response.body);
         }
 

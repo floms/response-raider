@@ -1,100 +1,42 @@
-import { launch } from 'chrome-launcher';
-import btoa from 'btoa';
-import { getStatusText, OK } from 'http-status-codes';
 import * as _ from 'lodash';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 import { ResponseInterceptorI, RequestI } from './types';
-import { interceptRequest, handleInterceptedResponse, RaiderConfig } from './util';
+import { Config } from './util';
+import { Debugger } from './util/debugger';
 
-const CDP = require('chrome-remote-interface')
+const debug = new Debugger();
 
-export const intercept = async (requests: ResponseInterceptorI[]) => {
-    const chromeFlags = [
-        '--auto-open-devtools-for-tabs'
-    ];
+export const intercept = async (interceptors: ResponseInterceptorI[]) => {
+    debug.loadInterceptors(interceptors);
 
-    const dataPath = RaiderConfig.DataPath;
-
-    if (dataPath) {
-        chromeFlags.push(`--user-data-dir=${dataPath}`);
-    }
-
-    const chrome = await launch({
-        chromeFlags
-    });
-
-    const { Runtime, Network } = await CDP({
-        port: chrome.port
-    });
-
-    await Promise.all([Runtime.enable(), Network.enable()]);
-
-    Runtime.consoleAPICalled(({ args, type }: { type: 'log' | 'error' | 'info' | 'warn', args: any }) => {
-        let logger = console[type];
-
-        if (!logger) {
-            logger = console.log;
-        }
-
-        if (RaiderConfig.log) {
-            logger.apply(console, args.map((a: any) => a.value));
-        }
-    });
-
-    await Network.setRequestInterception({
-        patterns: requests.map(req => ({
-            urlPattern: req.uri,
-            interceptionStage: 'Request'
-        }))
-    });
-
-    Network.requestIntercepted(async ({ interceptionId, request }: any) => {
-        const response = await interceptRequest(requests, request);
-
-        if (response) {
-            console.log(`${request.method} ${request.url}`);
-
-            const isJSON = typeof response.body === 'object';
-
-            const body = isJSON ? JSON.stringify(response.body) : `${response.body}`;
-
-            const headers = _.map(response.headers, header => `${header.name}: ${header.value}`);
-
-            headers.push(`Content-Length: ${body.length}`);
-
-            if (isJSON) {
-                headers.push('Content-Type: application/json;');
-            }
-
-            const responseCode = response.status ? response.status : OK;
-
-            const RESPONSE_SEPARATOR = '\r\n';
-
-            return Network.continueInterceptedRequest({
-                interceptionId,
-                rawResponse: btoa(
-                    `HTTP/1.1 ${responseCode} ${getStatusText(responseCode)}${RESPONSE_SEPARATOR}` +
-                    headers.join(RESPONSE_SEPARATOR) +
-                    `${RESPONSE_SEPARATOR}${RESPONSE_SEPARATOR}${body}`
-                )
-            });
-        }
-
-        Network.continueInterceptedRequest({
-            interceptionId
-        });
-    });
+    debug.listen(Config.RaidConfig.port, 1000);
 };
 
 export const interceptor = async () => {
+
+    const handleInterceptedResponse = (response: AxiosResponse) => {
+        if (response.headers[Config.HEADER]) {
+            return {
+                headers: Object.keys(response.headers).map(
+                    name => ({
+                        name,
+                        value: response.headers[name]
+                    })
+                ),
+                body: response.data,
+                status: response.status
+            };
+        }
+    };
+
     return intercept([
         {
             uri: '**',
             handle: async (request: RequestI) => {
 
                 try {
-                    const response = await axios.post(RaiderConfig.SERVER.endpoint, request);
+                    const response = await axios.post(Config.SERVER.endpoint, request);
 
                     return handleInterceptedResponse(response);
                 } catch (error) {

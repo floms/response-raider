@@ -8,82 +8,20 @@ Are you needing to modify the response to apply test or develop UI code, then Re
 npm install @onefloms/response-raider
 ```
 
-
 ## Usage
 
-```typescript
-import { intercept, ResponseInterceptorI } from '@onefloms/response-raider';
-
-const interceptors: ResponseInterceptorI[] = [
-    // custom status code with request handler
-    {
-        uri: 'http://example.com/protected',
-        handle: (request: RequestI) => {
-            return {
-                headers: [],
-                body: {
-                    authorized: false
-                },
-                status: 401
-            };
-        },
-    },
-    // standard 200 response code with request handler
-    {
-        uri: 'http://example.com/profile',
-        handle: (request: RequestI) => {
-            return {
-                headers: [],
-                body: {
-                    firstName: 'Yoel',
-                    lastName: 'Nunez',
-                    time: new Date()
-                }
-            };
-        },
-    },
-    // custom status code with static response object
-    {
-        uri: 'http://example.com/test',
-        response: {
-            body: {
-                message: 'Hello World'
-            },
-            status: 201
-        }
-    }
-];
-
-intercept(interceptors).then(() => {
-    console.log('launched');
-});
-```
-
-
-## Advanced Usage
-
-In the previous example every time a response mock is updated a browser restart will be required; this could be problematic if you have an application with protected resources that requires login everytime or if the flow you are testing is very complex and involves a lot of steps. To allow more flexibility and ease of use a dynamic response interceptor is available.
-
-> ***NEW***: with the new `raid` binary executable only the `server.ts` file in the example below is needed. To Run add a script to the `package.json` and to run it is use `npm run launch`
+Using ResponseRaider requires two steps: Step 1 launch a browser instance, Step 2 launch raid to intercept responses. The browser can be left open after modifying the request interceptors.
 
 `package.json`
 ```json
 {
   ...
   "scripts": {
-    "launch": "raid server.ts"
+    "launch": "launch -p /path/to/browser/user/data",
+    "raid": "raid server.ts"
   }
   ...
 }
-```
-
-`main.ts`
-```typescript
-import { raid, interceptor } from '@onefloms/response-raider';
-
-interceptor().then(() => {
-  raid('server.js');
-});
 ```
 
 `server.ts`
@@ -120,4 +58,4 @@ interference(requests).then(() => {
 });
 ```
 
-To run this example, simply call `ts-node index.ts`
+To run this example, simply call `npm run launch` and `npm run raid`
