@@ -3,9 +3,15 @@ import { RequestI, ResponseI } from '../types';
 
 export const interceptRequest = async (requests: any[], request: RequestI): Promise<ResponseI | undefined> => {
     const handlerMatch = requests.find(mock => {
-        const matcher = new Minimatch(mock.uri);
+        const matches = (new Minimatch(mock.uri)).match(request.url || '');
 
-        return matcher.match(request.url || '');
+        if (mock.method) {
+            const sameType = `${mock.method}`.trim().toUpperCase() === `${request.method}`.trim().toUpperCase();
+
+            return sameType && matches;;
+        }
+
+        return matches;
     });
 
     if (handlerMatch) {
