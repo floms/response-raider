@@ -8,7 +8,7 @@ export const interceptRequest = async (requests: any[], request: RequestI): Prom
         if (mock.method) {
             const sameType = `${mock.method}`.trim().toUpperCase() === `${request.method}`.trim().toUpperCase();
 
-            return sameType && matches;;
+            return sameType && matches;
         }
 
         return matches;
